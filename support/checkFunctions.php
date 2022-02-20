@@ -10,11 +10,4 @@ function checkDataRowsForNull($data, $template)
     return false;
 }
 
-// function checkDataRowsForNull($data){
-//     foreach ($data as $dataRow) {
-//         if ($dataRow === '') {
-//             return true;
-//         }
-//     }
-//     return false;
-// }
+

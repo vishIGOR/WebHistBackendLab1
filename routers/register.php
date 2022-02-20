@@ -12,7 +12,7 @@ function route($method, $urlData, $formData)
         exit;
     }
 
-    if (count($formData) != 4) {
+    if (count($formData) !== 4) {
         printErrorMessage(400, "Bad Request", __FUNCTION__);
         exit;
     }
@@ -36,9 +36,9 @@ function route($method, $urlData, $formData)
     // $usernameCheck->execute();
 
     $username = $formData["username"];
-    $usernameCheck = $link->query("SELECT * FROM users WHERE username = '$username'");
+    $usernameCheckResult = $link->query("SELECT * FROM users WHERE username = '$username'");
 
-    if ($usernameCheck->fetch_all()[0] != null) {
+    if ($usernameCheckResult->fetch_all()[0] != null) {
         printErrorMessage(400, "Bad Request", __FUNCTION__);
         exit;
     }
@@ -46,15 +46,15 @@ function route($method, $urlData, $formData)
     $name = $formData["name"];
     $surname = $formData["surname"];
     $password = $formData["password"];
-    $putNewUserIntoDatabase = $link->query("INSERT users(username, name, surname, password) 
+    $link->query("INSERT users(username, name, surname, password) 
     VALUES ('$username','$name','$surname','$password')");
 
-    $checkForUser = $link->query("SELECT * FROM users WHERE username = '$username' AND password = '$password'");
-    $checkForUser = $checkForUser->fetch_all()[0];
-    $userId = $checkForUser[0];
+    $checkForUserResult = $link->query("SELECT * FROM users WHERE username = '$username' AND password = '$password'");
+    $checkForUserResult = $checkForUserResult->fetch_all()[0];
+    $userId = $checkForUserResult[0];
 
     $token = bin2hex(random_bytes(20));
-    $putTokenIntoDatabase = $link->query("INSERT authorizationtokens(userId,tokenValue) 
+    $link->query("INSERT authorizationtokens(userId,tokenValue) 
     VALUES('$userId', '$token')");
     
     printSuccessMessageWithData(200, "OK", ["token" => $token]);

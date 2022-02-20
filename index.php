@@ -33,6 +33,7 @@ $urls = explode('/', $url);
 
 echo json_encode($formData) . PHP_EOL;
 echo json_encode($urls) . PHP_EOL;
+echo json_encode(getallheaders()) . PHP_EOL;
 
 $router = $urls[0];
 $urlData = array_slice($urls, 1);
@@ -48,32 +49,3 @@ try {
 
 include_once 'routers/' . $router . '.php';
 route($method, $urlData, $formData);
-
-//  echo bin2hex(random_bytes(20)) . PHP_EOL; //генерация токена
-
-//echo json_encode(getallheaders()) . PHP_EOL; //получение headers
-
-// $link = mysqli_connect("127.0.0.1:60666", "lab1_user", "lab1_pswd", "lab1");
-
-// if (!$link) {
-//     echo "Ошибка: Невозможно установить соединение с MySQL." . PHP_EOL;
-//     echo "Код ошибки errno: " . mysqli_connect_errno() . PHP_EOL;
-//     echo "Текст ошибки error: " . mysqli_connect_error() . PHP_EOL;
-//     exit;
-// }
-
-// echo "Информация о сервере: " . mysqli_get_host_info($link) . PHP_EOL;
-// $res = $link->query("SELECT roleId FROM roles ORDER BY roleId ASC");
-// if (!$res) //SQL
-// {
-//     echo "Не удалось выполнить запрос: (" . $mysqli->errno . ") " . $mysqli->error;
-// }
-// else
-// {
-//     while ($row = $res->fetch_assoc()) 
-//     {
-//         echo " id = " . $row['roleId'] . "\n";
-//     }
-// }
-
-// mysqli_close($link); 
