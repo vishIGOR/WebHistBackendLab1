@@ -38,7 +38,7 @@ function route($method, $urlData, $formData)
     $username = $formData["username"];
     $usernameCheckResult = $link->query("SELECT * FROM users WHERE username = '$username'");
 
-    if ($usernameCheckResult->fetch_all()[0] != null) {
+    if ($usernameCheckResult->fetch_all()[0] !== null) {
         printErrorMessage(400, "Bad Request", __FUNCTION__);
         exit;
     }

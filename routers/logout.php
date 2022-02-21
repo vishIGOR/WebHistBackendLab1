@@ -20,7 +20,7 @@ function route($method, $urlData, $formData)
 
     $token = getallheaders()["Authorization"];
     if (substr($token, 0, 7) !== "Bearer "){
-        printErrorMessage(400, "Bad Request", __FUNCTION__);
+        printErrorMessage(403, "Forbidden", __FUNCTION__);
         exit;
     }
     $token = substr($token, 7);
