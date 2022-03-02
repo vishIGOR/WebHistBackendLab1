@@ -1,20 +1,14 @@
 <?php
 function route($method, $urlData, $formData)
 {
-    require_once($_SERVER['DOCUMENT_ROOT'] . '/support/printFunctions.php');
-    require_once($_SERVER['DOCUMENT_ROOT'] . '/support/dbFunctions.php');
-    require_once($_SERVER['DOCUMENT_ROOT'] . '/support/checkFunctions.php');
-
     $formData = (array)$formData;
 
     if ($method !== 'POST') {
-        printErrorMessage(400, "Bad Request", __FUNCTION__);
-        exit;
+        printErrorMessage(400, "Bad Request", "type of request");
     }
 
     if (count($formData) !== 4) {
-        printErrorMessage(400, "Bad Request", __FUNCTION__);
-        exit;
+        printErrorMessage(400, "Bad Request", "number of rows");
     }
 
     $templateForCheck = array(
@@ -22,10 +16,8 @@ function route($method, $urlData, $formData)
         "name" => 0, "surname" => 0
     );
     if (checkDataRowsForNull($formData, $templateForCheck)) {
-        printErrorMessage(400, "Bad Request", __FUNCTION__);
-        exit;
+        printErrorMessage(400, "Bad Request", "datarows");
     }
-
 
     $link = connectToDataBase();
     checkConnectionWithDataBase($link);
@@ -39,13 +31,12 @@ function route($method, $urlData, $formData)
     $usernameCheckResult = $link->query("SELECT * FROM users WHERE username = '$username'");
 
     if ($usernameCheckResult->fetch_all()[0] !== null) {
-        printErrorMessage(400, "Bad Request", __FUNCTION__);
-        exit;
+        printErrorMessage(400, "Bad Request", "username");
     }
 
     $name = $formData["name"];
     $surname = $formData["surname"];
-    $password = $formData["password"];
+    $password = hash("sha1", $formData["password"]);
     $link->query("INSERT users(username, name, surname, password) 
     VALUES ('$username','$name','$surname','$password')");
 
@@ -56,6 +47,6 @@ function route($method, $urlData, $formData)
     $token = bin2hex(random_bytes(20));
     $link->query("INSERT authorizationtokens(userId,tokenValue) 
     VALUES('$userId', '$token')");
-    
+
     printSuccessMessageWithData(200, "OK", ["token" => $token]);
 }

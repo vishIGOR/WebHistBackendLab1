@@ -1,5 +1,7 @@
 <?php
 require_once($_SERVER['DOCUMENT_ROOT'] . '/support/printFunctions.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/support/dbFunctions.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/support/checkFunctions.php');
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -31,9 +33,9 @@ $url = (isset($_GET['q'])) ? $_GET['q'] : '';
 $url = rtrim($url, '/');
 $urls = explode('/', $url);
 
-echo json_encode($formData) . PHP_EOL;
-echo json_encode($urls) . PHP_EOL;
-echo json_encode(getallheaders()) . PHP_EOL;
+// echo json_encode($formData) . PHP_EOL;
+// echo json_encode($urls) . PHP_EOL;
+// echo json_encode(getallheaders()) . PHP_EOL;
 
 $router = $urls[0];
 $urlData = array_slice($urls, 1);
@@ -44,7 +46,6 @@ try {
     }
 } catch (Exception $e) {
     printErrorMessage(404, "Not Found", "mainFunction");
-    exit;
 }
 
 include_once 'routers/' . $router . '.php';

@@ -1,9 +1,6 @@
 <?php
 function route($method, $urlData, $formData)
 {
-    require_once($_SERVER['DOCUMENT_ROOT'] . '/support/printFunctions.php');
-    require_once($_SERVER['DOCUMENT_ROOT'] . '/support/dbFunctions.php');
-    require_once($_SERVER['DOCUMENT_ROOT'] . '/support/checkFunctions.php');
 
     $formData = (array)$formData;
 
@@ -11,14 +8,12 @@ function route($method, $urlData, $formData)
         case 'GET':
             if ($urlData === []) {
                 if (count($formData) !== 1) {
-                    printErrorMessage(400, "Bad Request", __FUNCTION__);
-                    exit;
+                    printErrorMessage(400, "Bad Request", "number of rows");
                 }
 
                 $token = getallheaders()["Authorization"];
                 if (substr($token, 0, 7) !== "Bearer ") {
-                    printErrorMessage(403, "Forbidden", __FUNCTION__);
-                    exit;
+                    printErrorMessage(403, "Forbidden", "token");
                 }
                 $token = substr($token, 7);
 
@@ -28,7 +23,6 @@ function route($method, $urlData, $formData)
                 $checkForAdminRole = checkUserForAdminRoleByToken($token, $link);
                 if ($checkForAdminRole !== true) {
                     printErrorMessage($checkForAdminRole[0], $checkForAdminRole[1], $checkForAdminRole[2]);
-                    exit;
                 }
 
                 $getAllUsersResult = $link->query("SELECT userId, username, roleId FROM users");
@@ -47,14 +41,12 @@ function route($method, $urlData, $formData)
 
             if (preg_match('/^([1-9][0-9]*|0)$/', $urlData[0])) {
                 if (count($formData) !== 1) {
-                    printErrorMessage(400, "Bad Request", __FUNCTION__);
-                    exit;
+                    printErrorMessage(400, "Bad Request", "number of rows");
                 }
 
                 $token = getallheaders()["Authorization"];
                 if (substr($token, 0, 7) !== "Bearer ") {
-                    printErrorMessage(403, "Forbidden", __FUNCTION__);
-                    exit;
+                    printErrorMessage(403, "Forbidden", "token");
                 }
                 $token = substr($token, 7);
 
@@ -63,22 +55,19 @@ function route($method, $urlData, $formData)
 
                 $userIdByToken = getUserIdByToken($token, $link);
                 if ($userIdByToken === null) {
-                    printErrorMessage(403, "Forbidden", __FUNCTION__);
-                    exit;
+                    printErrorMessage(403, "Forbidden", "token");
                 }
 
                 if ($urlData[0] !== $userIdByToken) {
                     $checkForAdminRole = checkUserForAdminRoleByToken($token, $link);
                     if ($checkForAdminRole !== true) {
                         printErrorMessage($checkForAdminRole[0], $checkForAdminRole[1], $checkForAdminRole[2]);
-                        exit;
                     }
                 }
                 $userId = $urlData[0];
 
                 if (!checkUserForExistingById($userId, $link)) {
-                    printErrorMessage(400, "Bad Request", __FUNCTION__);
-                    exit;
+                    printErrorMessage(400, "Bad Request", "userId");
                 }
 
                 $httpAnwserData = getUserDataExceptPasswordById($userId, $link);
@@ -86,18 +75,16 @@ function route($method, $urlData, $formData)
                 break;
             }
 
-            printErrorMessage(404, "Not Found", __FUNCTION__);
+            printErrorMessage(404, "Not Found", "userId");
             break;
         case "PATCH":
 
             if (!preg_match('/^([1-9][0-9]*|0)$/', $urlData[0])) {
-                printErrorMessage(404, "Not Found", __FUNCTION__);
-                exit;
+                printErrorMessage(404, "Not Found", "userId");
             }
 
             if (count($formData) <= 0 || count($formData) > 4) {
-                printErrorMessage(400, "Bad Request", __FUNCTION__);
-                exit;
+                printErrorMessage(400, "Bad Request", "number of rows");
             }
 
             $templateForCheck = array(
@@ -105,14 +92,12 @@ function route($method, $urlData, $formData)
                 "name" => 0, "surname" => 0
             );
             if (checkDataRowsForTemplateNotMatchingOrNull($formData, $templateForCheck)) {
-                printErrorMessage(400, "Bad Request", __FUNCTION__);
-                exit;
+                printErrorMessage(400, "Bad Request", "datarows");
             }
 
             $token = getallheaders()["Authorization"];
             if (substr($token, 0, 7) !== "Bearer ") {
-                printErrorMessage(403, "Forbidden", __FUNCTION__);
-                exit;
+                printErrorMessage(403, "Forbidden", "token");
             }
             $token = substr($token, 7);
 
@@ -121,8 +106,7 @@ function route($method, $urlData, $formData)
 
             $userIdByToken = getUserIdByToken($token, $link);
             if ($userIdByToken === null) {
-                printErrorMessage(403, "Forbidden", __FUNCTION__);
-                exit;
+                printErrorMessage(403, "Forbidden", "token");
             }
 
             if ($urlData[0] !== $userIdByToken) {
@@ -130,22 +114,19 @@ function route($method, $urlData, $formData)
 
                 if ($checkForAdminRole !== true) {
                     printErrorMessage($checkForAdminRole[0], $checkForAdminRole[1], $checkForAdminRole[2]);
-                    exit;
                 }
             }
             $userId = $urlData[0];
 
             if (!checkUserForExistingById($userId, $link)) {
-                printErrorMessage(400, "Bad Request", __FUNCTION__);
-                exit;
+                printErrorMessage(400, "Bad Request", "userId");
             }
 
             if ($formData["username"] !== null) {
                 $userIdWithThisUsername = getUserIdByUsername($formData["username"], $link);
                 if ($userIdWithThisUsername !== null) {
                     if ($userIdWithThisUsername !== $userId) {
-                        printErrorMessage(400, "Bad Request", __FUNCTION__);
-                        exit;
+                        printErrorMessage(400, "Bad Request", "access");
                     }
                 }
             }
@@ -159,19 +140,16 @@ function route($method, $urlData, $formData)
             break;
         case "DELETE":
             if (!preg_match('/^([1-9][0-9]*|0)$/', $urlData[0])) {
-                printErrorMessage(404, "Not Found", __FUNCTION__);
-                exit;
+                printErrorMessage(404, "Not Found", "userId");
             }
 
             if (count($formData) !== 0) {
-                printErrorMessage(400, "Bad Request", __FUNCTION__);
-                exit;
+                printErrorMessage(400, "Bad Request", "number of rows");
             }
 
             $token = getallheaders()["Authorization"];
             if (substr($token, 0, 7) !== "Bearer ") {
-                printErrorMessage(403, "Forbidden", __FUNCTION__);
-                exit;
+                printErrorMessage(403, "Forbidden", "token");
             }
             $token = substr($token, 7);
 
@@ -180,8 +158,7 @@ function route($method, $urlData, $formData)
 
             $userIdByToken = getUserIdByToken($token, $link);
             if ($userIdByToken === null) {
-                printErrorMessage(403, "Forbidden", __FUNCTION__);
-                exit;
+                printErrorMessage(403, "Forbidden", "token");
             }
 
             if ($urlData[0] !== $userIdByToken) {
@@ -189,47 +166,40 @@ function route($method, $urlData, $formData)
 
                 if ($checkForAdminRole !== true) {
                     printErrorMessage($checkForAdminRole[0], $checkForAdminRole[1], $checkForAdminRole[2]);
-                    exit;
                 }
             }
             $userId = $urlData[0];
 
             if (!checkUserForExistingById($userId, $link)) {
-                printErrorMessage(400, "Bad Request", __FUNCTION__);
-                exit;
+                printErrorMessage(400, "Bad Request", "userId");
             }
 
             $link->query("DELETE FROM users WHERE userId ='$userId'");
             if (mysqli_affected_rows($link) !== 1) {
-                printErrorMessage(500, "Internal Server Error", __FUNCTION__);
-                exit;
+                printErrorMessage(500, "Internal Server Error", "server");
             }
             printSuccessMessageWithoutData(200, "OK");
 
             break;
         case "POST":
             if (!preg_match('/^([1-9][0-9]*|0)$/', $urlData[0])) {
-                printErrorMessage(404, "Not Found", __FUNCTION__);
-                exit;
+                printErrorMessage(404, "Not Found", "userId");
             }
 
             if (count($formData) !== 1) {
-                printErrorMessage(400, "Bad Request", __FUNCTION__);
-                exit;
+                printErrorMessage(400, "Bad Request", "number of rows");
             }
 
             $templateForCheck = array(
                 "roleId" => 0
             );
             if (checkDataRowsForNull($formData, $templateForCheck)) {
-                printErrorMessage(400, "Bad Request", __FUNCTION__);
-                exit;
+                printErrorMessage(400, "Bad Request", "datarows");
             }
 
             $token = getallheaders()["Authorization"];
             if (substr($token, 0, 7) !== "Bearer ") {
-                printErrorMessage(403, "Forbidden", __FUNCTION__);
-                exit;
+                printErrorMessage(403, "Forbidden", "token");
             }
             $token = substr($token, 7);
 
@@ -240,14 +210,12 @@ function route($method, $urlData, $formData)
 
             if ($checkForAdminRole !== true) {
                 printErrorMessage($checkForAdminRole[0], $checkForAdminRole[1], $checkForAdminRole[2]);
-                exit;
             }
 
             $userId = $urlData[0];
 
             if (!checkUserForExistingById($userId, $link)) {
-                printErrorMessage(400, "Bad Request", __FUNCTION__);
-                exit;
+                printErrorMessage(400, "Bad Request", "userId");
             }
 
             $roleId = $formData["roleId"];
@@ -255,50 +223,17 @@ function route($method, $urlData, $formData)
             $checkRoleForExistingResult = $link->query("SELECT * FROM roles WHERE roleId = '$roleId'");
 
             if ($checkRoleForExistingResult->fetch_all()[0] === null) {
-                printErrorMessage(400, "Bad Request", __FUNCTION__);
-                exit;
+                printErrorMessage(400, "Bad Request", "roleId");
             }
 
-            $link->query("DELETE FROM roles WHERE roleId = '$roleId'");
+            $link->query("UPDATE users SET roleId = '$roleId' WHERE userId = '$userId'");
 
             printSuccessMessageWithoutData(200, "OK");
             break;
         default:
-            printErrorMessage(400, "Bad Request", __FUNCTION__);
+            printErrorMessage(400, "Bad Request", "type of request");
             break;
     }
-}
-
-function checkUserForAdminRoleByToken($token, $link)
-{
-    $userId = getUserIdByToken($token, $link);
-    if ($userId === null) {
-        return array(403, "Forbidden", __FUNCTION__);
-    }
-
-    $checkUserRoleResult = $link->query("SELECT roleId FROM users WHERE userId ='$userId'");
-    $userRole = $checkUserRoleResult->fetch_all()[0][0];
-    if ($userRole === null) {
-        return array(403, "Forbidden", __FUNCTION__);
-    }
-
-    $checkAdminRoleResult = $link->query("SELECT roleId FROM roles WHERE roleName = 'Администратор'");
-    $adminRole = $checkAdminRoleResult->fetch_all()[0][0];
-    if ($adminRole === null) {
-        return array(500, "Internal Server Error", __FUNCTION__);
-    }
-
-    if ($adminRole !== $userRole) {
-        return array(403, "Forbidden", __FUNCTION__);
-    }
-    return  true;
-}
-
-function getUserIdByToken($token, $link)
-{
-    $checkTokenResult = $link->query("SELECT userId FROM authorizationtokens WHERE tokenValue='$token'");
-
-    return $checkTokenResult->fetch_all()[0][0];
 }
 
 function getUserDataExceptPasswordById($userId, $link)
@@ -320,13 +255,4 @@ function getUserIdByUsername($username, $link)
     $getUserIdByUsernameResult = $link->query("SELECT userId FROM users WHERE username = '$username'");
 
     return $getUserIdByUsernameResult->fetch_all()[0][0];
-}
-
-function checkUserForExistingById($userId, $link)
-{
-    $link->query("SELECT username FROM users WHERE userId = '$userId'");
-
-    if (mysqli_affected_rows($link) === 0)
-        return false;
-    return true;
 }

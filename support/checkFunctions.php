@@ -22,3 +22,16 @@ function checkDataRowsForTemplateNotMatchingOrNull($data, $template)
     }
     return false;
 }
+
+function checkTokenType($type)
+{
+    $token = getallheaders()["Authorization"];
+    if (substr($token, 0, 7) === $type . " ") {
+        return substr($token, 7);
+    }
+    return false;
+}
+
+function checkStringForNumber($value){
+    return preg_match('/^([1-9][0-9]*|0)$/', $value);
+}
