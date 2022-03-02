@@ -131,6 +131,10 @@ function route($method, $urlData, $formData)
                 }
             }
 
+            if ($formData["password"] !== null) {
+                $formData["password"] = hash("sha1",$formData["password"]);
+            }
+
             foreach ($formData as $rowKey => $rowData) {
                 $link->query("UPDATE users SET $rowKey = '$rowData' WHERE userId = '$userId';");
             }
@@ -182,7 +186,7 @@ function route($method, $urlData, $formData)
 
             break;
         case "POST":
-            if (!preg_match('/^([1-9][0-9]*|0)$/', $urlData[0])) {
+            if (!preg_match('/^([1-9][0-9]*|0)$/', $urlData[0]) && $urlData[1] === "role") {
                 printErrorMessage(404, "Not Found", "userId");
             }
 
